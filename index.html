@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <title>Audrey's Calculator</title>
+  </head>
+  <body class="container">
+    <div class="position-relative">
+      <div class="position-absolute top-0 end-0"></div>
+      <h1 id="date"></h1>
+      <button
+        type="button"
+        class="btn btn-info float-end"
+        onclick="finishTheDay()"
+      >
+        Cloture journée
+      </button>
+    </div>
+    <form class="row g-3 align-items-center text-center my-5">
+      <div class="col-auto">
+        <p class="fw-bold">Client</p>
+        <input type="text" id="client" class="form-control" required />
+      </div>
+      <div class="col-auto">
+        <p class="fw-bold">Coiffure</p>
+        <input type="text" id="hairstyle" class="form-control" required />
+      </div>
+      <div class="col-auto">
+        <p class="fw-bold">Montant</p>
+        <input type="number" id="amount" class="form-control" required />
+      </div>
+      <div class="col-auto">
+        <p class="fw-bold">Type de paiement</p>
+        <div>
+          <input
+            type="radio"
+            name="payment"
+            id="cb"
+            value="cb"
+            class="form-check-input mb-3"
+            checked
+          /><label for="cb">CB</label><br />
+          <input
+            type="radio"
+            name="payment"
+            id="cheque"
+            value="cheque"
+            class="form-check-input mb-3"
+          />
+          <label for="cheque">Cheque</label><br />
+          <input
+            type="radio"
+            name="payment"
+            id="espece"
+            value="espece"
+            class="form-check-input"
+          /><label for="espece">Especes</label>
+        </div>
+      </div>
+      <div class="col-auto">
+        <button
+          type="button"
+          class="btn btn-success"
+          onclick="validation()"
+          id="validationButton"
+        >
+          Valider
+        </button>
+        <button type="button" class="d-none" id="editButton">Editer</button>
+      </div>
+    </form>
+
+    <div id="mainTable">
+      <table class="table table-striped" id="entries">
+        <thead>
+          <tr>
+            <th scope="col">Client</th>
+            <th scope="col">Coiffure</th>
+            <th scope="col">Montant</th>
+            <th scope="col">Paiement</th>
+            <th scope="col">Modification</th>
+            <th scope="col">Suppression</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot></tfoot>
+      </table>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.debug.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.2.3/jspdf.plugin.autotable.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <script src="main.js"></script>
+  </body>
+</html>

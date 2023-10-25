@@ -1,0 +1,209 @@
+const DayMonthYear = document.getElementById("date");
+const client = document.getElementById("client");
+const hairstyle = document.getElementById("hairstyle");
+const amount = document.getElementById("amount");
+const radio = document.getElementsByName("payment");
+const validationButton = document.getElementById("validationButton");
+const editButton = document.getElementById("editButton");
+const footer = document.querySelector("#entries tfoot");
+
+let id = 0;
+let list = [];
+const infoFooterPDF = [];
+let goodIndex;
+let localeDate = new Date().toLocaleDateString("fr");
+
+DayMonthYear.innerHTML = localeDate;
+DayMonthYear.style.fontWeight = "bold";
+DayMonthYear.style.marginTop = "1em";
+
+function refresh() {
+  updateList();
+  updateFooter();
+  setTimeout(() => {
+    client.value = "";
+    hairstyle.value = "";
+    amount.value = "";
+  }, 100);
+}
+
+function validation() {
+  if (client.value != "" && hairstyle.value != "" && amount.value != "") {
+    thePush();
+    refresh();
+  }
+}
+
+function thePush() {
+  let payment;
+  for (let i = 0; i < radio.length; i++) {
+    if (radio[i].checked) {
+      payment = radio[i].value;
+    }
+  }
+  const operation = {
+    id,
+    client: client.value,
+    hairstyle: hairstyle.value,
+    amount: parseInt(amount.value),
+    payment,
+  };
+
+  list.push(operation);
+  id++;
+}
+
+function updateList() {
+  const entries = document.querySelector("#entries tbody");
+
+  let line = "";
+
+  for (const element of list) {
+    line += `<tr>
+                  <td> ${element.client} </td>
+                  <td> ${element.hairstyle} </td>
+                  <td> ${element.amount} </td>
+                  <td> ${element.payment}</td>
+                  <td> <button onclick=edit(${element.id}) class="btn btn-warning">Modifier</button></td>
+                  <td> <button onclick=del(${element.id}) class="btn btn-danger">Supprimer</button></td>
+              </tr>`;
+
+    entries.innerHTML = line;
+  }
+}
+
+function updateFooter() {
+  let totals = "";
+
+  let nbCB = 0;
+  let amountCB = 0;
+  let nbCheque = 0;
+  let amountCheque = 0;
+  let nbEspece = 0;
+  let amountEspece = 0;
+
+  for (const element of list) {
+    switch (element.payment) {
+      case "cb":
+        nbCB += 1;
+        amountCB += parseInt(element.amount);
+        break;
+      case "cheque":
+        nbCheque += 1;
+        amountCheque += parseInt(element.amount);
+        break;
+      case "espece":
+        nbEspece += 1;
+        amountEspece += parseInt(element.amount);
+        break;
+      default:
+        alert("Erreur dans la matrice");
+    }
+  }
+
+  totals += `<tr class="table-group-divider">
+                  <td> ${nbCB} regl. CB  </td>
+                  <td> ${amountCB} € </td>           
+                  <td> ${nbCheque} regl. cheque </td>
+                  <td> ${amountCheque} € </td>
+                  <td> ${nbEspece} regl. espece </td>
+                  <td> ${amountEspece} € </td>    
+              </tr>`;
+
+  footer.innerHTML = totals;
+
+  infoFooterPDF.splice(0, infoFooterPDF.length);
+  infoFooterPDF.push(
+    nbCB,
+    amountCB,
+    nbCheque,
+    amountCheque,
+    nbEspece,
+    amountEspece
+  );
+}
+
+function indexToChange(id) {
+  for (const element of list) {
+    if (id == element.id) {
+      return list.indexOf(element);
+    }
+  }
+}
+
+function edit(id) {
+  goodIndex = indexToChange(id);
+  let newPayment;
+  client.value = list[goodIndex].client;
+  hairstyle.value = list[goodIndex].hairstyle;
+  amount.value = list[goodIndex].amount;
+  validationButton.className = "d-none";
+  editButton.className = "btn btn-success";
+
+  editButton.addEventListener("click", function (e) {
+    e.preventDefault();
+    for (let i = 0; i < radio.length; i++) {
+      if (radio[i].checked) {
+        newPayment = radio[i].value;
+      }
+    }
+    let newEdition = {
+      id: list[goodIndex].id,
+      client: client.value,
+      hairstyle: hairstyle.value,
+      amount: parseInt(amount.value),
+      payment: newPayment,
+    };
+    list[goodIndex] = newEdition;
+
+    validationButton.className = "btn btn-success";
+    editButton.className = "d-none";
+    refresh();
+  });
+}
+
+function del(id) {
+  if (confirm("Voulez-vous vraiment supprimer cette ligne? ")) {
+    let goodIndex = indexToChange(id);
+    list.splice(goodIndex, 1);
+    refresh();
+    alert("Suppression effectuée");
+  } else {
+    alert("Suppression annulée");
+  }
+}
+
+function finishTheDay() {
+  if (confirm("Journée terminée?")) {
+    const pdf = new jsPDF();
+    const infoHeader = [["Client", "", "Coiffure", "", "Montant", "Paiement"]];
+    const infoBody = [];
+    const infoFoot = [
+      [
+        `${infoFooterPDF[0]} CB`,
+        `${infoFooterPDF[1]} Euro${infoFooterPDF[1] > 1 ? "s" : ""}`,
+        `${infoFooterPDF[2]} Cheque${infoFooterPDF[2] > 1 ? "s" : ""}`,
+        `${infoFooterPDF[3]} Euro${infoFooterPDF[3] > 1 ? "s" : ""}`,
+        `${infoFooterPDF[4]} Espece${infoFooterPDF[4] > 1 ? "s" : ""}`,
+        `${infoFooterPDF[5]} Euro${infoFooterPDF[5] > 1 ? "s" : ""}`,
+      ],
+    ];
+
+    list.forEach((el, i, ar) => {
+      infoBody.push([el.client, "", el.hairstyle, "", el.amount, el.payment]);
+    });
+
+    pdf.text(localeDate, 15, 10);
+
+    pdf.autoTable({
+      // html:"#entries"
+      head: infoHeader,
+      body: infoBody,
+      foot: infoFoot,
+    });
+
+    pdf.save(`${localeDate}.pdf`);
+  } else {
+    alert("A plus tard");
+  }
+}
