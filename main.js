@@ -57,9 +57,11 @@ function updateList() {
   const entries = document.querySelector("#entries tbody");
 
   let line = "";
-
-  for (const element of list) {
-    line += `<tr>
+  if ((list.length = 0)) {
+    line = "";
+  } else {
+    for (const element of list) {
+      line += `<tr>
                   <td> ${element.client} </td>
                   <td> ${element.hairstyle} </td>
                   <td> ${element.amount} </td>
@@ -68,7 +70,8 @@ function updateList() {
                   <td> <button onclick=del(${element.id}) class="btn btn-danger">Supprimer</button></td>
               </tr>`;
 
-    entries.innerHTML = line;
+      entries.innerHTML = line;
+    }
   }
 }
 
