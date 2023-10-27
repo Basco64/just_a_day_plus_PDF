@@ -56,7 +56,7 @@ function thePush() {
 
 function updateList() {
   const entries = document.querySelector("#entries tbody");
-  console.log(list.length);
+
   let line = "";
   if (list.length == 0) {
     console.log("vide");
@@ -99,7 +99,7 @@ function updateFooter() {
 
   for (const element of list) {
     switch (element.payment) {
-      case "cb":
+      case "CB":
         nbCB += 1;
         amountCB += parseInt(element.amount);
         break;
@@ -207,12 +207,14 @@ function finishTheDay() {
       parseInt(infoFooterPDF[1]) +
       parseInt(infoFooterPDF[3]) +
       parseInt(infoFooterPDF[5])
-    }`;
+    } euros`;
 
     list.forEach((el, i, ar) => {
       infoBody.push([el.client, "", el.hairstyle, "", el.amount, el.payment]);
     });
 
+    pdf.setFont("times", "bold");
+    pdf.setFontSize(30);
     pdf.text(localeDate, 15, 10);
 
     pdf.autoTable({
@@ -222,7 +224,7 @@ function finishTheDay() {
       foot: infoFoot,
     });
 
-    pdf.text(totals, 70, 250);
+    pdf.text(totals, 95, 250, null, null, "center");
 
     pdf.save(`${localeDate}.pdf`);
   } else {
