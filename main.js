@@ -16,6 +16,7 @@ let localeDate = new Date().toLocaleDateString("fr");
 DayMonthYear.innerHTML = localeDate;
 DayMonthYear.style.fontWeight = "bold";
 DayMonthYear.style.marginTop = "1em";
+refresh();
 
 function refresh() {
   updateList();
@@ -55,11 +56,24 @@ function thePush() {
 
 function updateList() {
   const entries = document.querySelector("#entries tbody");
-
+  console.log(list.length);
   let line = "";
-
-  for (const element of list) {
+  if (list.length == 0) {
+    console.log("vide");
     line += `<tr>
+              <td> --- </td>
+              <td> --- </td>
+              <td> --- </td>
+              <td> --- </td>
+              <td> <button  class="btn btn-warning" disabled>Modifier</button></td>
+              <td> <button  class="btn btn-danger" disabled>Supprimer</button></td>
+            </tr>`;
+
+    entries.innerHTML = line;
+  } else {
+    for (const element of list) {
+      console.log("pas vide");
+      line += `<tr>
                   <td> ${element.client} </td>
                   <td> ${element.hairstyle} </td>
                   <td> ${element.amount} </td>
@@ -68,7 +82,8 @@ function updateList() {
                   <td> <button onclick=del(${element.id}) class="btn btn-danger">Supprimer</button></td>
               </tr>`;
 
-    entries.innerHTML = line;
+      entries.innerHTML = line;
+    }
   }
 }
 
@@ -188,6 +203,11 @@ function finishTheDay() {
         `${infoFooterPDF[5]} Euro${infoFooterPDF[5] > 1 ? "s" : ""}`,
       ],
     ];
+    const totals = `Total de la journée : ${
+      parseInt(infoFooterPDF[1]) +
+      parseInt(infoFooterPDF[3]) +
+      parseInt(infoFooterPDF[5])
+    }`;
 
     list.forEach((el, i, ar) => {
       infoBody.push([el.client, "", el.hairstyle, "", el.amount, el.payment]);
@@ -201,6 +221,8 @@ function finishTheDay() {
       body: infoBody,
       foot: infoFoot,
     });
+
+    pdf.text(totals,70,250);
 
     pdf.save(`${localeDate}.pdf`);
   } else {
