@@ -222,7 +222,7 @@ function finishTheDay() {
       foot: infoFoot,
     });
 
-    pdf.text(totals,70,250);
+    pdf.text(totals, 70, 250);
 
     pdf.save(`${localeDate}.pdf`);
   } else {
