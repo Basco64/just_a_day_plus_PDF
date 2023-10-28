@@ -7,7 +7,6 @@ const validationButton = document.getElementById("validationButton");
 const editButton = document.getElementById("editButton");
 const footer = document.querySelector("#entries tfoot");
 
-let id = 0;
 const listInStorage = localStorage.getItem("list");
 let list = [];
 const infoFooterPDF = [];
@@ -21,6 +20,8 @@ DayMonthYear.style.marginTop = "1em";
 if (listInStorage) {
   list = JSON.parse(listInStorage);
 }
+
+let id = list.length;
 refresh();
 
 function refresh() {
@@ -31,10 +32,6 @@ function refresh() {
     hairstyle.value = "";
     amount.value = "";
   }, 100);
-
-  console.log(listInStorage);
-  console.log("---");
-  console.log(list);
 }
 
 function validation() {
@@ -91,7 +88,6 @@ function updateList() {
               </tr>`;
     }
     entries.innerHTML = line;
-    console.log(list);
   }
 }
 
@@ -239,6 +235,8 @@ function finishTheDay() {
     pdf.save(`${localeDate}.pdf`);
 
     localStorage.clear();
+    list = [];
+    refresh();
   } else {
     alert("A plus tard");
   }
