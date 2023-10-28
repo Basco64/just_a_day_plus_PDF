@@ -8,6 +8,7 @@ const editButton = document.getElementById("editButton");
 const footer = document.querySelector("#entries tfoot");
 
 let id = 0;
+const listInStorage = localStorage.getItem("list");
 let list = [];
 const infoFooterPDF = [];
 let goodIndex;
@@ -16,6 +17,10 @@ let localeDate = new Date().toLocaleDateString("fr");
 DayMonthYear.innerHTML = localeDate;
 DayMonthYear.style.fontWeight = "bold";
 DayMonthYear.style.marginTop = "1em";
+
+if (listInStorage) {
+  list = JSON.parse(listInStorage);
+}
 refresh();
 
 function refresh() {
@@ -26,6 +31,10 @@ function refresh() {
     hairstyle.value = "";
     amount.value = "";
   }, 100);
+
+  console.log(listInStorage);
+  console.log("---");
+  console.log(list);
 }
 
 function validation() {
@@ -52,6 +61,7 @@ function thePush() {
 
   list.push(operation);
   id++;
+  localStorage.setItem("list", JSON.stringify(list));
 }
 
 function updateList() {
@@ -59,7 +69,6 @@ function updateList() {
 
   let line = "";
   if (list.length == 0) {
-    console.log("vide");
     line += `<tr>
               <td> --- </td>
               <td> --- </td>
@@ -72,7 +81,6 @@ function updateList() {
     entries.innerHTML = line;
   } else {
     for (const element of list) {
-      console.log("pas vide");
       line += `<tr>
                   <td> ${element.client} </td>
                   <td> ${element.hairstyle} </td>
@@ -81,9 +89,9 @@ function updateList() {
                   <td> <button onclick=edit(${element.id}) class="btn btn-warning">Modifier</button></td>
                   <td> <button onclick=del(${element.id}) class="btn btn-danger">Supprimer</button></td>
               </tr>`;
-
-      entries.innerHTML = line;
     }
+    entries.innerHTML = line;
+    console.log(list);
   }
 }
 
@@ -174,6 +182,7 @@ function edit(id) {
     validationButton.className = "btn btn-success";
     editButton.className = "d-none";
     refresh();
+    localStorage.setItem("list", JSON.stringify(list));
   });
 }
 
@@ -182,6 +191,7 @@ function del(id) {
     let goodIndex = indexToChange(id);
     list.splice(goodIndex, 1);
     refresh();
+    localStorage.setItem("list", JSON.stringify(list));
     alert("Suppression effectuée");
   } else {
     alert("Suppression annulée");
@@ -227,6 +237,8 @@ function finishTheDay() {
     pdf.text(totals, 95, 250, null, null, "center");
 
     pdf.save(`${localeDate}.pdf`);
+
+    localStorage.clear();
   } else {
     alert("A plus tard");
   }
