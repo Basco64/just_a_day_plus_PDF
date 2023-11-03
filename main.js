@@ -52,7 +52,7 @@ function thePush() {
     id,
     client: client.value,
     hairstyle: hairstyle.value,
-    amount: parseInt(amount.value),
+    amount: parseFloat(amount.value),
     payment,
   };
 
@@ -105,15 +105,15 @@ function updateFooter() {
     switch (element.payment) {
       case "CB":
         nbCB += 1;
-        amountCB += parseInt(element.amount);
+        amountCB += parseFloat(element.amount);
         break;
       case "cheque":
         nbCheque += 1;
-        amountCheque += parseInt(element.amount);
+        amountCheque += parseFloat(element.amount);
         break;
       case "espece":
         nbEspece += 1;
-        amountEspece += parseInt(element.amount);
+        amountEspece += parseFloat(element.amount);
         break;
       default:
         alert("Erreur dans la matrice");
@@ -170,7 +170,7 @@ function edit(id) {
       id: list[goodIndex].id,
       client: client.value,
       hairstyle: hairstyle.value,
-      amount: parseInt(amount.value),
+      amount: parseFloat(amount.value),
       payment: newPayment,
     };
     list[goodIndex] = newEdition;
@@ -210,9 +210,9 @@ function finishTheDay() {
       ],
     ];
     const totals = `Total de la journée : ${
-      parseInt(infoFooterPDF[1]) +
-      parseInt(infoFooterPDF[3]) +
-      parseInt(infoFooterPDF[5])
+      parseFloat(infoFooterPDF[1]) +
+      parseFloat(infoFooterPDF[3]) +
+      parseFloat(infoFooterPDF[5])
     } euros`;
 
     list.forEach((el, i, ar) => {
