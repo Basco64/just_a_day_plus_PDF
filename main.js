@@ -38,10 +38,9 @@ if (serviceInStorage) {
 let id = list.length;
 refresh();
 
-service.addEventListener("click", (e) => updateService());
-client.addEventListener("click", (e) => updateClient());
-
 function refresh() {
+  updateClient()
+  updateService()
   updateList();
   updateFooter();
   setTimeout(() => {
