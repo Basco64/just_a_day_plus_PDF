@@ -1,18 +1,24 @@
 const DayMonthYear = document.getElementById("date");
 const client = document.getElementById("client");
-const hairstyle = document.getElementById("hairstyle");
+const clientListHTML = document.getElementById("clientList");
+const service = document.getElementById("service");
+const serviceListHTML = document.getElementById("serviceList");
 const amount = document.getElementById("amount");
 const radio = document.getElementsByName("payment");
 const validationButton = document.getElementById("validationButton");
 const editButton = document.getElementById("editButton");
 const footer = document.querySelector("#entries tfoot");
 
-const listInStorage = localStorage.getItem("list");
-let list = [];
 const infoFooterPDF = [];
+const listInStorage = localStorage.getItem("list");
+const clientInStorage = localStorage.getItem("client");
+const serviceInStorage = localStorage.getItem("service");
+let list = [];
+let clientList = [];
+let serviceList = [];
 let goodIndex;
-let localeDate = new Date().toLocaleDateString("fr");
 
+let localeDate = new Date().toLocaleDateString("fr");
 DayMonthYear.innerHTML = localeDate;
 DayMonthYear.style.fontWeight = "bold";
 DayMonthYear.style.marginTop = "1em";
@@ -21,27 +27,43 @@ if (listInStorage) {
   list = JSON.parse(listInStorage);
 }
 
+if (clientInStorage) {
+  clientList = JSON.parse(clientInStorage);
+}
+
+if (serviceInStorage) {
+  serviceList = JSON.parse(serviceInStorage);
+}
+
 let id = list.length;
 refresh();
+
+service.addEventListener("click", (e) => updateService());
+client.addEventListener("click", (e) => updateClient());
 
 function refresh() {
   updateList();
   updateFooter();
   setTimeout(() => {
     client.value = "";
-    hairstyle.value = "";
+    service.value = "";
     amount.value = "";
   }, 100);
 }
 
-function validation() {
-  if (client.value != "" && hairstyle.value != "" && amount.value != "") {
-    thePush();
-    refresh();
+function pushClientInStorage(value) {
+  clientList.push(value);
+  localStorage.setItem("client", JSON.stringify(clientList));
+}
+
+function pushServiceInStorage(value) {
+  if (!serviceList.includes(value)) {
+    serviceList.push(value);
+    localStorage.setItem("service", JSON.stringify(serviceList));
   }
 }
 
-function thePush() {
+function pushListInStorage() {
   let payment;
   for (let i = 0; i < radio.length; i++) {
     if (radio[i].checked) {
@@ -51,7 +73,7 @@ function thePush() {
   const operation = {
     id,
     client: client.value,
-    hairstyle: hairstyle.value,
+    service: service.value,
     amount: parseFloat(amount.value),
     payment,
   };
@@ -59,6 +81,31 @@ function thePush() {
   list.push(operation);
   id++;
   localStorage.setItem("list", JSON.stringify(list));
+}
+
+function updateClient() {
+  let line = "";
+  for (const element of clientList) {
+    line += `<option value="${element}">`;
+  }
+  clientListHTML.innerHTML = line;
+}
+
+function updateService() {
+  let line = "";
+  for (const element of serviceList) {
+    line += `<option value="${element}">`;
+  }
+  serviceListHTML.innerHTML = line;
+}
+
+function validation() {
+  if (client.value != "" && service.value != "" && amount.value != "") {
+    pushClientInStorage(client.value);
+    pushServiceInStorage(service.value);
+    pushListInStorage();
+    refresh();
+  }
 }
 
 function updateList() {
@@ -80,7 +127,7 @@ function updateList() {
     for (const element of list) {
       line += `<tr>
                   <td> ${element.client} </td>
-                  <td> ${element.hairstyle} </td>
+                  <td> ${element.service} </td>
                   <td> ${element.amount} </td>
                   <td> ${element.payment}</td>
                   <td> <button onclick=edit(${element.id}) class="btn btn-warning">Modifier</button></td>
@@ -154,7 +201,7 @@ function edit(id) {
   goodIndex = indexToChange(id);
   let newPayment;
   client.value = list[goodIndex].client;
-  hairstyle.value = list[goodIndex].hairstyle;
+  service.value = list[goodIndex].service;
   amount.value = list[goodIndex].amount;
   validationButton.className = "d-none";
   editButton.className = "btn btn-success";
@@ -169,7 +216,7 @@ function edit(id) {
     let newEdition = {
       id: list[goodIndex].id,
       client: client.value,
-      hairstyle: hairstyle.value,
+      service: service.value,
       amount: parseFloat(amount.value),
       payment: newPayment,
     };
@@ -216,7 +263,7 @@ function finishTheDay() {
     } euros`;
 
     list.forEach((el, i, ar) => {
-      infoBody.push([el.client, "", el.hairstyle, "", el.amount, el.payment]);
+      infoBody.push([el.client, "", el.service, "", el.amount, el.payment]);
     });
 
     pdf.setFont("times", "bold");
@@ -234,7 +281,7 @@ function finishTheDay() {
 
     pdf.save(`${localeDate}.pdf`);
 
-    localStorage.clear();
+    localStorage.removeItem("list");
     list = [];
     refresh();
   } else {
