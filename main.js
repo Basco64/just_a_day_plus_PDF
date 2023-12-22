@@ -1,6 +1,8 @@
+// localStorage.clear();
+
 const DayMonthYear = document.getElementById("date");
 const client = document.getElementById("client");
-const clientListHTML = document.getElementById("clientList");
+// const clientListHTML = document.getElementById("clientList");
 const service = document.getElementById("service");
 const serviceListHTML = document.getElementById("serviceList");
 const amount = document.getElementById("amount");
@@ -11,10 +13,10 @@ const footer = document.querySelector("#entries tfoot");
 
 const infoFooterPDF = [];
 const listInStorage = localStorage.getItem("list");
-const clientInStorage = localStorage.getItem("client");
+// const clientInStorage = localStorage.getItem("client");
 const serviceInStorage = localStorage.getItem("service");
 let list = [];
-let clientList = [];
+// let clientList = [];
 let serviceList = [];
 let goodIndex;
 
@@ -27,9 +29,9 @@ if (listInStorage) {
   list = JSON.parse(listInStorage);
 }
 
-if (clientInStorage) {
-  clientList = JSON.parse(clientInStorage);
-}
+// if (clientInStorage) {
+//   clientList = JSON.parse(clientInStorage);
+// }
 
 if (serviceInStorage) {
   serviceList = JSON.parse(serviceInStorage);
@@ -39,7 +41,7 @@ let id = list.length;
 refresh();
 
 function refresh() {
-  updateClient()
+  // updateClient()
   updateService()
   updateList();
   updateFooter();
@@ -50,10 +52,10 @@ function refresh() {
   }, 100);
 }
 
-function pushClientInStorage(value) {
-  clientList.push(value);
-  localStorage.setItem("client", JSON.stringify(clientList));
-}
+// function pushClientInStorage(value) {
+//   clientList.push(value);
+//   localStorage.setItem("client", JSON.stringify(clientList));
+// }
 
 function pushServiceInStorage(value) {
   if (!serviceList.includes(value)) {
@@ -82,13 +84,13 @@ function pushListInStorage() {
   localStorage.setItem("list", JSON.stringify(list));
 }
 
-function updateClient() {
+// function updateClient() {
   let line = "";
   for (const element of clientList) {
     line += `<option value="${element}">`;
   }
   clientListHTML.innerHTML = line;
-}
+// }
 
 function updateService() {
   let line = "";
@@ -100,7 +102,7 @@ function updateService() {
 
 function validation() {
   if (client.value != "" && service.value != "" && amount.value != "") {
-    pushClientInStorage(client.value);
+    // pushClientInStorage(client.value);
     pushServiceInStorage(service.value);
     pushListInStorage();
     refresh();
