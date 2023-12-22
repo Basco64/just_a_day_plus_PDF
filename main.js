@@ -84,12 +84,21 @@ function pushListInStorage() {
   localStorage.setItem("list", JSON.stringify(list));
 }
 
-// function updateClient() {
-  let line = "";
-  for (const element of clientList) {
-    line += `<option value="${element}">`;
+function validation() {
+  if (client.value != "" && service.value != "" && amount.value != "") {
+    // pushClientInStorage(client.value);
+    pushServiceInStorage(service.value);
+    pushListInStorage();
+    refresh();
   }
-  clientListHTML.innerHTML = line;
+}
+
+// function updateClient() {
+  // let line = "";
+  // for (const element of clientList) {
+  //   line += `<option value="${element}">`;
+  // }
+  // clientListHTML.innerHTML = line;
 // }
 
 function updateService() {
@@ -100,14 +109,6 @@ function updateService() {
   serviceListHTML.innerHTML = line;
 }
 
-function validation() {
-  if (client.value != "" && service.value != "" && amount.value != "") {
-    // pushClientInStorage(client.value);
-    pushServiceInStorage(service.value);
-    pushListInStorage();
-    refresh();
-  }
-}
 
 function updateList() {
   const entries = document.querySelector("#entries tbody");
