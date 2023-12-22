@@ -1,4 +1,6 @@
 // localStorage.clear();
+localStorage.removeItem("client");
+
 
 const DayMonthYear = document.getElementById("date");
 const client = document.getElementById("client");
