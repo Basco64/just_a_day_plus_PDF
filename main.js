@@ -1,7 +1,6 @@
 // localStorage.clear();
 localStorage.removeItem("client");
 
-
 const DayMonthYear = document.getElementById("date");
 const client = document.getElementById("client");
 // const clientListHTML = document.getElementById("clientList");
@@ -44,7 +43,7 @@ refresh();
 
 function refresh() {
   // updateClient()
-  updateService()
+  updateService();
   updateList();
   updateFooter();
   setTimeout(() => {
@@ -96,11 +95,11 @@ function validation() {
 }
 
 // function updateClient() {
-  // let line = "";
-  // for (const element of clientList) {
-  //   line += `<option value="${element}">`;
-  // }
-  // clientListHTML.innerHTML = line;
+// let line = "";
+// for (const element of clientList) {
+//   line += `<option value="${element}">`;
+// }
+// clientListHTML.innerHTML = line;
 // }
 
 function updateService() {
@@ -110,7 +109,6 @@ function updateService() {
   }
   serviceListHTML.innerHTML = line;
 }
-
 
 function updateList() {
   const entries = document.querySelector("#entries tbody");
@@ -248,7 +246,9 @@ function del(id) {
 function finishTheDay() {
   if (confirm("Journée terminée?")) {
     const pdf = new jsPDF();
-    const infoHeader = [["Client", "", "Coiffure", "", "Montant", "Paiement"]];
+    const infoHeader = [
+      ["Client", "", "Prestation", "", "Montant", "Paiement"],
+    ];
     const infoBody = [];
     const infoFoot = [
       [
