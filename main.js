@@ -170,13 +170,13 @@ function updateFooter() {
   }
 
   totals += `<tr class="table-group-divider">
-                  <td> ${nbCB} regl. CB  </td>
-                  <td> ${amountCB} € </td>           
-                  <td> ${nbCheque} regl. cheque </td>
-                  <td> ${amountCheque} € </td>
-                  <td> ${nbEspece} regl. espece </td>
-                  <td> ${amountEspece} € </td>    
-              </tr>`;
+              <td> ${nbEspece} regl. espece </td>
+              <td> ${amountEspece} € </td>   
+              <td> ${nbCheque} regl. cheque </td>
+              <td> ${amountCheque} € </td>
+              <td> ${nbCB} regl. CB  </td>
+              <td> ${amountCB} € </td>       
+            </tr>`;
 
   footer.innerHTML = totals;
 
@@ -252,12 +252,12 @@ function finishTheDay() {
     const infoBody = [];
     const infoFoot = [
       [
-        `${infoFooterPDF[0]} CB`,
-        `${infoFooterPDF[1]} Euro${infoFooterPDF[1] > 1 ? "s" : ""}`,
-        `${infoFooterPDF[2]} Cheque${infoFooterPDF[2] > 1 ? "s" : ""}`,
-        `${infoFooterPDF[3]} Euro${infoFooterPDF[3] > 1 ? "s" : ""}`,
         `${infoFooterPDF[4]} Espece${infoFooterPDF[4] > 1 ? "s" : ""}`,
         `${infoFooterPDF[5]} Euro${infoFooterPDF[5] > 1 ? "s" : ""}`,
+        `${infoFooterPDF[2]} Cheque${infoFooterPDF[2] > 1 ? "s" : ""}`,
+        `${infoFooterPDF[3]} Euro${infoFooterPDF[3] > 1 ? "s" : ""}`,
+        `${infoFooterPDF[0]} CB`,
+        `${infoFooterPDF[1]} Euro${infoFooterPDF[1] > 1 ? "s" : ""}`,
       ],
     ];
     const totals = `Total de la journée : ${
