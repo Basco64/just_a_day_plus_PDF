@@ -3,7 +3,6 @@ module.exports = {
     ecmaVersion: 2021,
     sourceType: "module",
   },
-  plugins: ["@next/next"], 
   extends: [
     "next/core-web-vitals",
     "eslint:recommended",
