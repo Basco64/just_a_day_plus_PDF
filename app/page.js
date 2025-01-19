@@ -25,7 +25,7 @@ import DateDisplay from "@components/DateDisplay";
 import { ConfirmationDialog } from "@components/ConfirmationDialog";
 import { generateDailyPDF } from "@/src/utils/PDFGenerator";
 
-export default function App() {
+export default function Home() {
   const [list, setList] = useState([]);
   const [totals, setTotals] = useState({ CB: 0, cheque: 0, espece: 0 });
   const [isDayDialogOpen, setIsDayDialogOpen] = useState(false);
