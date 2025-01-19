@@ -9,6 +9,7 @@ module.exports = {
   ],
   rules: {
     "@next/next/no-html-link-for-pages": "error",
+    "no-unused-vars": "warn",
   },
   ignorePatterns: ["node_modules/", ".next/", "out/"],
 };
