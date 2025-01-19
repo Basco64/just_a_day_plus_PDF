@@ -1,101 +1,168 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import Form from "@components/Form";
+import Table from "@components/Table";
+import Footer from "@components/Footer";
+import {
+  handleValidation,
+  handleDelete,
+  handleEdit,
+  calculateTotals,
+} from "@utils/helpers";
+import { finishTheDay } from "@utils/daily";
+import { closeMonth } from "@utils/monthly";
+import {
+  getDailyEntries,
+  saveDailyEntries,
+  getMonthlyTotals,
+  saveMonthlyTotals,
+  clearDailyEntries,
+  clearStorage,
+} from "@utils/storage";
+import { Button } from "@components/ui/button";
+import DateDisplay from "@components/DateDisplay";
+import { ConfirmationDialog } from "@components/ConfirmationDialog";
+import { generateDailyPDF } from "@/src/utils/PDFGenerator";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [list, setList] = useState([]);
+  const [totals, setTotals] = useState({ CB: 0, cheque: 0, espece: 0 });
+  const [isDayDialogOpen, setIsDayDialogOpen] = useState(false);
+  const [isMonthDialogOpen, setIsMonthDialogOpen] = useState(false);
+  const [currentDate, setCurrentDate] = useState("");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+  useEffect(() => {
+    const dailyEntries = getDailyEntries();
+    const monthlyTotals = getMonthlyTotals();
+    const currentDate = localStorage.getItem("currentDate");
+    setList(dailyEntries);
+    setTotals(calculateTotals(dailyEntries));
+  }, []);
+
+  const handleConfirmDay = () => {
+    const dailyTotals = calculateTotals(list);
+
+    generateDailyPDF(list);
+
+    const dailySummary = {
+      date: currentDate,
+      CB: dailyTotals.CB.amount,
+      cheque: dailyTotals.cheque.amount,
+      espece: dailyTotals.espece.amount,
+      total:
+        dailyTotals.CB.amount +
+        dailyTotals.cheque.amount +
+        dailyTotals.espece.amount,
+    };
+
+    const dailySummaries = JSON.parse(
+      localStorage.getItem("dailySummaries") || "[]"
+    );
+    dailySummaries.push(dailySummary);
+    localStorage.setItem("dailySummaries", JSON.stringify(dailySummaries));
+
+    const monthlyTotals = getMonthlyTotals();
+    const updatedMonthlyTotals = {
+      CB: monthlyTotals.CB + dailyTotals.CB.amount,
+      cheque: monthlyTotals.cheque + dailyTotals.cheque.amount,
+      espece: monthlyTotals.espece + dailyTotals.espece.amount,
+    };
+
+    saveMonthlyTotals(updatedMonthlyTotals);
+    clearDailyEntries();
+    setList([]);
+    setTotals({ CB: 0, cheque: 0, espece: 0 });
+    setIsDayDialogOpen(false);
+    alert(`Journée du ${currentDate} clôturée et PDF généré.`);
+  };
+
+  const handleConfirmMonth = () => {
+    const monthlyTotals = getMonthlyTotals();
+    closeMonth(monthlyTotals);
+    saveMonthlyTotals({ CB: 0, cheque: 0, espece: 0 });
+    setIsMonthDialogOpen(false);
+  };
+
+  return (
+    <div className="container mx-auto p-4">
+      <div className="flex justify-between items-center my-14 mx-16">
+        <h1 className="text-2xl font-bold">Comptabilité Journalière</h1>
+        <DateDisplay />
+      </div>
+      <Form
+  onValidation={() =>
+    handleValidation(list, setList, (newList) => {
+      saveDailyEntries(newList);
+      setTotals(calculateTotals(newList));
+
+      if (!localStorage.getItem("currentDate")) {
+        const currentDate = new Date().toLocaleDateString("fr");
+        localStorage.setItem("currentDate", currentDate);
+        setCurrentDate(currentDate);
+      }
+
+      if (!localStorage.getItem("currentMonthYear")) {
+        const currentMonthYear = new Date().toLocaleDateString("fr", {
+          month: "long",
+          year: "numeric",
+        });
+        localStorage.setItem("currentMonthYear", currentMonthYear);
+      }
+    })
+  }
+/>
+      <Table
+        list={list}
+        onEdit={(id) =>
+          handleEdit(id, list, setList, (newList) => {
+            saveDailyEntries(newList);
+            setList(newList);
+            setTotals(calculateTotals(newList));
+          })
+        }
+        onDelete={(id) =>
+          handleDelete(id, list, setList, (newList) => {
+            saveDailyEntries(newList);
+            setList(newList);
+            setTotals(calculateTotals(newList));
+          })
+        }
+      />
+      <Footer totals={totals} />
+      <div className="mt-4 flex gap-10 justify-center">
+        <Button
+          onClick={() => setIsDayDialogOpen(true)}
+          className="bg-green-500 hover:bg-green-600"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          Clôturer la journée
+        </Button>
+        <Button
+          onClick={() => setIsMonthDialogOpen(true)}
+          className="bg-blue-500 hover:bg-blue-600"
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          Clôturer le mois
+        </Button>
+        {/* <Button onClick={clearStorage} className="bg-red-500 hover:bg-red-600">
+          clean storage
+        </Button> */}
+      </div>
+
+      <ConfirmationDialog
+        isOpen={isDayDialogOpen}
+        onClose={() => setIsDayDialogOpen(false)}
+        onConfirm={handleConfirmDay}
+        title={`Confirmer la clôture de la journée du ${currentDate}`}
+        description={`Êtes-vous sûr de vouloir clôturer la journée du ${currentDate} ? Cette action est irréversible.`}
+      />
+
+      <ConfirmationDialog
+        isOpen={isMonthDialogOpen}
+        onClose={() => setIsMonthDialogOpen(false)}
+        onConfirm={handleConfirmMonth}
+        title="Confirmer la clôture du mois"
+        description="Êtes-vous sûr de vouloir clôturer le mois ? Cette action est irréversible."
+      />
     </div>
   );
 }
