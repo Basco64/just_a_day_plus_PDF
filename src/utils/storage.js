@@ -29,3 +29,16 @@ export const clearStorage = () => {
   alert("LocalStorage vidé");
   window.location.reload();
 };
+
+export const getServices = () => {
+  const data = localStorage.getItem("services");
+  return data ? JSON.parse(data) : [];
+};
+
+export const saveService = (service) => {
+  const services = getServices();
+  if (!services.includes(service)) {
+    services.push(service);
+    localStorage.setItem("services", JSON.stringify(services));
+  }
+};
